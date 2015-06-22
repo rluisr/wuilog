@@ -9,10 +9,10 @@ $list = array(
     "通知しないIPアドレス（自分のIPとか)"
 );
 
-foreach($file as $row) {
-    if(strstr($row, "::ffff:")) {
+foreach ($file as $row) {
+    if (strstr($row, "::ffff:")) {
         $replaced = trim(preg_replace($replace, "", $row));
-        if(!in_array($replaced, $list, true)){
+        if (!in_array($replaced, $list, true)) {
             $array[] = $replaced;
         }
     }
@@ -21,16 +21,24 @@ foreach($file as $row) {
 $array = array_unique($array);
 $array = array_values($array);
 
-foreach($array as $row){
-    toTweet($row);
+foreach ($array as $row) {
+    toTweet($row, checkWhois($row));
 }
 
-function toTweet($ip){
+
+function toTweet($ip, $descr)
+{
     $sConsumerKey = "ConsumerKey";
     $sConsumerSecret = "ConsumerKeySecret";
     $sAccessToken = "AccessToken";
     $sAccessTokenSecret = "AccessTokenSecret";
     $twObj = new TwitterOAuth($sConsumerKey, $sConsumerSecret, $sAccessToken, $sAccessTokenSecret);
-    $sTweet = "@自分のscreen_name Warning IPaddress $ip";
+    $sTweet = "@lu_iskun Warning IPaddress ${ip} Organization:${descr}";
     $vRequest = $twObj->OAuthRequest("https://api.twitter.com/1.1/statuses/update.json", "POST", array("status" => $sTweet));
+}
+function checkWhois($ip)
+{
+    $descr = shell_exec("whois $ip |grep -m 1 descr:");
+    $descr = trim(preg_replace("/descr:/", "", $descr));
+    return $descr;
 }
