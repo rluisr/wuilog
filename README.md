@@ -1,4 +1,4 @@
 # wuilog
-Chinachuのwuiログから知らないIPを通知するもの
+Chinachuのwuiログから知らないIPを通知するもの<br>
 通知された場合にはiptablesか何かでrejectなりしない重複系の処理は
 してないので大変なことになります。
