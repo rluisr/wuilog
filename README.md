@@ -1,0 +1,2 @@
+# wuilog
+Chinachuのwuiログから知らないIPを通知するゴミ
