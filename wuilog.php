@@ -1,8 +1,7 @@
 <?php
 require_once('twitteroauth/twitteroauth.php');
-$file = file("ここにログwuiのパス");
-# $file = file("/home/chinachu/Chinachu/log/wui");
-$replace = "/(^(\\S+ ){6}::ffff:| (\\S)+$)/";
+$file = file("Path To Wui Log");
+$replace = "/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/";
 $list = array(
     "通知しないIPアドレス（自分のIPとか)",
     "通知しないIPアドレス（自分のIPとか)",
@@ -10,10 +9,10 @@ $list = array(
 );
 
 foreach ($file as $row) {
-    if (strstr($row, "::ffff:")) {
-        $replaced = trim(preg_replace($replace, "", $row));
-        if (!in_array($replaced, $list, true)) {
-            $array[] = $replaced;
+    if (strstr($row, "GET")) {
+        preg_match($replace, $row, $a);
+        if (!in_array($a[0], $list, TRUE)){
+            $array[] = $a[0];
         }
     }
 }
@@ -25,6 +24,8 @@ foreach ($array as $row) {
     toTweet($row, checkWhois($row));
 }
 
+toDeleteWuiLog($file);
+
 
 function toTweet($ip, $descr)
 {
@@ -33,7 +34,7 @@ function toTweet($ip, $descr)
     $sAccessToken = "AccessToken";
     $sAccessTokenSecret = "AccessTokenSecret";
     $twObj = new TwitterOAuth($sConsumerKey, $sConsumerSecret, $sAccessToken, $sAccessTokenSecret);
-    $sTweet = "@lu_iskun Warning IPaddress ${ip} Organization:${descr}";
+    $sTweet = "@ScreenName Warning IPaddress ${ip} Organization:${descr}";
     $vRequest = $twObj->OAuthRequest("https://api.twitter.com/1.1/statuses/update.json", "POST", array("status" => $sTweet));
 }
 function checkWhois($ip)
@@ -41,4 +42,7 @@ function checkWhois($ip)
     $descr = shell_exec("whois $ip |grep -m 1 descr:");
     $descr = trim(preg_replace("/descr:/", "", $descr));
     return $descr;
+}
+function toDeleteWuiLog($file){
+    shell_exec(": > $file");
 }
